@@ -18,29 +18,44 @@ contract("Tokenizer", (accounts) => {
         })
     })
 
-    describe('minting', async () => {
-        const regId = "reg1";
-        let owner_addr;
-        let owner;
-        it('message passed successfully', async () => {
-            const message = "Hello, World!";
-            await contract.mint(message, regId);
-            const result = await contract.getMessage(0);
-            assert.equal(result, message);
+    describe('register an user', async () => {
+        const name = "user1";
+        const residence = "Seoul"
+        let user_addr;
+        let user;
+        it('user successfully registered', async () => {
+            await contract.signup(name, residence);
+            user_addr = await contract.getOwnerAddress(name);
+            console.log(`Owner Address: ${user_addr}`);
+            assert.notEqual(user_addr, '');
+            assert.notEqual(user_addr, 0x0);
+            assert.notEqual(user_addr, undefined);
+            assert.notEqual(user_addr, null);
+            user = await MessageOwner.at(user_addr);
+            await user.registerAsHost();
+            const {0: reg_name, 1: reg_addr} = await user.getInfo();
+            assert.equal(reg_name, name);
+            assert.equal(reg_addr, residence);
         })
-        it('token owner created', async () => {
-            owner_addr = await contract.getOwnerAddress(regId);
-            console.log(`Owner Address: ${owner_addr}`);
-            assert.notEqual(owner_addr, '');
-            assert.notEqual(owner_addr, 0x0);
-            assert.notEqual(owner_addr, undefined);
-            assert.notEqual(owner_addr, null);
-            owner = await MessageOwner.at(owner_addr);
-            assert.equal(await owner.getRegId(), regId);
+
+        it('unregistered node cannot access', async() => {
+            const {0: reg_name, 1: reg_addr} = await user.getInfo({from: accounts[1]});
+            assert.notEqual(reg_name, name);
+            assert.notEqual(reg_addr, residence);
         })
-        it('token received', async () => {
-            const balance = await contract.balanceOf(owner_addr);
-            assert.equal(balance, 1);
+
+        it('registered node can access', async() => {
+            await user.register(accounts[2]);
+            const {0: reg_name, 1: reg_addr} = await user.getInfo({from: accounts[2]});
+            assert.equal(reg_name, name);
+            assert.equal(reg_addr, residence);
+        })
+
+        it('deregistered node cannot access', async() => {
+            await user.deregister(accounts[2]);
+            const {0: reg_name, 1: reg_addr} = await user.getInfo({from: accounts[2]});
+            assert.notEqual(reg_name, name);
+            assert.notEqual(reg_addr, residence);
         })
 
     })

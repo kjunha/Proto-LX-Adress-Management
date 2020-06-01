@@ -1,23 +1,18 @@
 pragma solidity ^0.5.0;
 
-import "./ERC721Full.sol";
 import "./MessageOwner.sol";
 
-contract Tokenizer is ERC721Full {
-    string[] messages;
+contract Tokenizer {
     mapping(string => address) messageOwners;
-    constructor() ERC721Full("Token", "TOKEN") public {}
-    function mint(string memory _message, string memory _regId) public {
-        uint _id = messages.push(_message);
-        if(messageOwners[_regId] == 0x0000000000000000000000000000000000000000) {
-            MessageOwner owner = new MessageOwner(_regId);
-            messageOwners[_regId] = address(owner);
-        }
-        _mint(messageOwners[_regId], _id);
-    }
+    event RegisterNewUser(string name, string residence, address contractId);
 
-    function getMessage(uint _index) public view returns(string memory) {
-        return messages[_index];
+    //assume all name is unique
+    function signup(string memory _name, string memory _residence) public returns(address){
+        if(messageOwners[_name] == 0x0000000000000000000000000000000000000000) {
+            MessageOwner owner = new MessageOwner(_name, _residence);
+            messageOwners[_name] = address(owner);
+        }
+        return messageOwners[_name];
     }
 
     function getOwnerAddress(string memory _regId) public view returns(address) {
