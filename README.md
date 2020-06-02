@@ -1,63 +1,56 @@
-# 탈중앙화 어플리케이션 Quick Starter
-## Truffle.js를 이용한 Solidity 어플리케이션 개발 및 테스팅 및 로컬 Gnache 서버에서의 배포
-Framework 버전정보
-----
-버전정보 확인 필수!
-```
-Node v8.11.2
-npm v5.6.0
-Solidity v0.5.12 //^0.5.0 가능
-Truffle v5.0.44
-Web3.js v1.2.2
-```
-필수 Truffle.js 명령어
-----
-컴파일
-```
-truffle compile
-```
-마이그레이션
-```
-//새로운 마이그레이션
-truffle migration
-//기존 마이그레이션 업데이트
-truffle migration --reset
-```
-콘솔창
-```
-truffle console
-//종료
-> .exit
-```
-Dapp 개발 Lifecycle
-----
-1. 솔리디티 파일 작성. 리믹스 테스트환경에서 코드 무결성 확인 [Rimix](https://remix.ethereum.org/, "rimix link")
-(플러그인 추가에서 DEPLOY & RUN TRANSACTIONS 만 추가하면 됨)
-2. 마이그레이션 파일 작성. 마이그레이션 파일 제목은 마이그레이션 순서를 나타내는 번호로 함
-3. 테스팅 혹은 로컬 테스트넷(Gnache) 환경에서 실행
-    + test 폴더 안에 테스트.js 파일 작성
-    + truffle-config.js 설정내용 확인
-    + truffle test 로 테스트 </br>
-혹은</br>
-    + truffle compile 로 컴파일함
-    + truffle migration 으로 마이그레이션 함
-    + (마이그레이션 수정 없이 Solidity 만 수정된 경우 --reset 옵션 사용함)
-    + truffle console 에서 실행가능
+#LX 주소혁신 프로젝트 프로젝트
+개발자: 김준하
+<br/>
 
-기타 개발 팁
+기능
 ----
-블록체인 구조특성상 트렌잭션을 수행하는데 시간이 오래 걸리므로 async 키워드를 사용하여 비동기 호출함
-예를들어 콘솔에서나 테스팅에서 계약을 불러올 시 (함수리턴값을 변수에 할당할때도 동일)
-```javascript
-const contract = async <ContractName>.deployed()
++ 사용자가 입력한 이름과 주소를 새로운 스마트계약에 저장
++ 사용자가 기존에 등록한 동일한 이름을 사용하고 다른 주소를 사용할 시 기존 스마트계약의 주소정보 업데이트
++ Host가 주소정보 요청시 별도 조회가능기업 등록 없이 조회 가능
++ 일반 기업이 주소정보 요청시 각 개인에게 조회가능기업으로 등록되어 있다면 조회 가능.
++ 개인에게 조회가능기업으로 등록되지 않은 기업은 해당 개인에게 개인주소정보 조회 불가.
+
+프로토타입 전제조건
+----
+- 본 시스템의 이용자를 1. 주소정보를 등록하여 사용하는 개인, 2. 주소정보를 요청하여 사용하는 기업, 3. 한국국토정보공사 (시스템 Host)로 전제하였습니다.
+- Ganache 로컬 블록체인 네트워크에서 제공하는 각 계정의 역할을 다음과 같이 전제했습니다.<br/>
+0번 계정: 한국 국토정보공사 (Host)<br/>
+1~n번 계정: 주소정보를 요청하는 기업체들
+- 각 개인은 고유한 이름을 가지고 있으며, 같은 이름을 가진 사람은 없다고 전제하였습니다. 
+
+요구사항
+----
++ Chrome 웹 브라우저
++ git LTS 버전
++ node, npm LTS 버전
++ Ganache 로컬 블록체인 네트워트 [Ganache 다운로드](https://www.trufflesuite.com/ganache, "ganache downloader")
++ Chrome 웹 브라우저 MetaMask Extention [MetaMask 다운로드](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=ko, "Metamask downloader")
+
+설치방법
+----
+1. 저장소를 복제한다.
+2. 복제한 저장소가 있는 디렉토리로 이동
+3. npm install 으로 필요한 패키지들을 다운받는다. <br/> (truffle.js 는 글로벌 환경에 설치 권장)
 ```
-리턴값이 없는 함수를 호출할 때
-```javascript
-async contract.<function>();
-async contract.<function>.call();
+npm install -g --save truffle
 ```
-Payable 함수와 non-payable 함수의 호출시
-```javascript
-send(uint amount); //payable 함수
-call(parameter); //view, pure 함수
+4. Ganache 실행 후 Quick Start 클릭
+5. RPC server 7545 포트 번호 확인
+6. MetaMask 실행 후 좌측상단 원형 계정 프로필 클릭 후 계정 가져오기 클릭
+7. Ganache 화면의 0번 인덱스 계정의 열쇠모양 아이콘 클릭 후 Private Key 복사하기
+8. 계정 가져오기 개인키 입력
+9. MetaMask 좌측 상단 원형 계정 프로필 아이콘 > 설정 > 네트워크
+10. 좌측 상단 네트워크 추가 클릭, 적당한 네트워크 이름 입력 (로컬 Ganache)
+11. 새로운 RPC URL에 HTTP://127.0.0.1:7545 입력 (5번에서 확인한 RPC 주소)
+12. 이후에 우측 상단 MetaMask 로고 클릭 후 죄측 상단 네트워크 Dropdown 목록에서 새로 추가한 네트워크 선택
+13. 다시 콘솔로 이동하여 복제한 저장소가 있는 디렉토리에서 truffle migrate 실행.
 ```
+truffle migrate
+//이미 한번 마이그레이션 한 경우 --reset 플레그를 이용
+truffle migrate --reset
+```
+14. 콘솔에서 npm start 실행
+```
+npm start
+```
+15. http:127.0.0.1:3000 혹은 localhost:3000 에서 어플리케이션 화면 확인
