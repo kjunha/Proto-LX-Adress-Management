@@ -11,6 +11,10 @@ contract Tokenizer {
         if(messageOwners[_name] == 0x0000000000000000000000000000000000000000) {
             MessageOwner owner = new MessageOwner(_name, _residence);
             messageOwners[_name] = address(owner);
+            owner.registerAsHost(msg.sender);
+        } else {
+            MessageOwner owner = MessageOwner(messageOwners[_name]);
+            owner.updateAddress(_residence);
         }
         return messageOwners[_name];
     }

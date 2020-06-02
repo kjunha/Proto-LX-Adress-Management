@@ -32,7 +32,12 @@ contract("Tokenizer", (accounts) => {
             assert.notEqual(user_addr, undefined);
             assert.notEqual(user_addr, null);
             user = await MessageOwner.at(user_addr);
-            await user.registerAsHost();
+            const {0: reg_name, 1: reg_addr} = await user.getInfo();
+            assert.equal(reg_name, name);
+            assert.equal(reg_addr, residence);
+        })
+
+        it('host can access anytime', async() => {
             const {0: reg_name, 1: reg_addr} = await user.getInfo();
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
@@ -57,6 +62,20 @@ contract("Tokenizer", (accounts) => {
             assert.notEqual(reg_name, name);
             assert.notEqual(reg_addr, residence);
         })
+    })
 
+    describe('update user information', async() => {
+        const name = "user1";
+        const residence = "Seoul 123"
+        let user_addr;
+        let user;
+        it('user address successfully updated', async () => {
+            await contract.signup(name, residence);
+            user_addr = await contract.getOwnerAddress(name);
+            user = await MessageOwner.at(user_addr);
+            const {0: reg_name, 1: reg_addr} = await user.getInfo();
+            assert.equal(reg_name, name);
+            assert.equal(reg_addr, residence);
+        })
     })
 })

@@ -5,6 +5,7 @@ contract MessageOwner {
     string public residence;
     address public host;
     mapping(address => bool) accessability;
+    event UpdateAddress(string residence);
     constructor(string memory _name, string memory _residence) public {
         host = address(msg.sender);
         name = _name;
@@ -27,7 +28,11 @@ contract MessageOwner {
         accessability[_corpId] = false;
     }
 
-    function registerAsHost() public {
-        host = msg.sender;
+    function updateAddress(string memory _residence) public {
+        residence = _residence;
+    }
+
+    function registerAsHost(address _host) public {
+        host = _host;
     }
 }
