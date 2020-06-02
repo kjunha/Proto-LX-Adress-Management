@@ -19,6 +19,7 @@ contract MessageOwner {
             _residence = "";
         }
     }
+    //only Host
     function register(address _corpId) public {
         accessability[_corpId] = true;
     }

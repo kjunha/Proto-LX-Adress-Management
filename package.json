@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "react-scripts start"
   },
   "keywords": [],
   "author": "",
@@ -22,10 +22,24 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "react": "^16.8.6",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^3.4.1",
     "truffle-flattener": "^1.4.2",
     "web3": "^1.2.8"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
