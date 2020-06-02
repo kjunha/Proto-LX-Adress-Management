@@ -114,7 +114,7 @@ class User extends Component {
     
     render() {
         return(
-            <div>
+            <div className="master">
                 {/* Client Page */}
                 <div class="px-3 py-3 bg-success">
                     <div class="jumbotron jumbotron-fluid">
@@ -123,52 +123,62 @@ class User extends Component {
                             <p class="lead">LX 주소혁신 프로젝트 아이디어 프론트타입 입니다. 각 사용자 이름은 중복되지 않습니다.</p>
                         </div>
                     </div>
-                    <form className="form-group" onSubmit={(event) => {
-                        event.preventDefault()
-                        var name = this.name.value
-                        var address = this.address.value
-                        this.signup(name, address)
-                    }}>
-                        <label for="name">이름</label>
-                        <input type="text" className="form-control mb-3" id="nane" ref={(input) => {this.name = input}}/>
-                        <label for="address">주소</label>
-                        <input type="text" className="form-control mb-3" id="address" ref={(input) => {this.address = input}}/>
-                        <button type="submit" className="btn pl-3 pr-3 btn-primary" value="SIGNUP">등록</button>
-                    </form>
                     <div class="card mb-3">
-                        <div class="card-header">요청정보 조회</div>
+                        <div class="card-header">주소정보 등록</div>
+                        <div class="card-body">
+                            <form className="form-group" onSubmit={(event) => {
+                                event.preventDefault()
+                                var name = this.name.value
+                                var address = this.address.value
+                                this.signup(name, address)
+                            }}>
+                                <label for="name">이름</label>
+                                <input type="text" className="form-control mb-3" id="nane" ref={(input) => {this.name = input}}/>
+                                <label for="address">주소</label>
+                                <input type="text" className="form-control mb-3" id="address" ref={(input) => {this.address = input}}/>
+                                <button type="submit" className="btn pl-3 pr-3 btn-primary" value="SIGNUP">등록</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">등록정보 조회</div>
                         <div class="card-body">
                             <p>Contract 주소: {this.state.contractId}</p>
                             <p>내 이름: {this.state.name}</p>
                             <p>내 주소: {this.state.address}</p>
                         </div>
                     </div>
-                    <form className="form-group" onSubmit={(event) => {
-                        event.preventDefault()
-                        var registration = this.reg_req.value
-                        this.register(registration)
-                    }}>
-                        <label for="name">조회승인 요청</label>
-                        <div class="input-group mb-3">
-                            <input type="text" className="form-control" placeholder="Corporation Node ID" id="name" ref={(input) => {this.reg_req = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-                            <div class="input-group-append">
-                                <button type="submit" className="btn pl-3 pr-3 btn-primary" value="REGISTER">등록</button>
-                            </div>
+                    <div class="card mb-3">
+                        <div class="card-header">조회가능기업 등록 및 해제</div>
+                        <div class="card-body">
+                            <form className="form-group" onSubmit={(event) => {
+                                event.preventDefault()
+                                var registration = this.reg_req.value
+                                this.register(registration)
+                            }}>
+                                <label for="name">조회승인 요청</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" className="form-control" placeholder="Corporation Node ID" id="name" ref={(input) => {this.reg_req = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
+                                    <div class="input-group-append">
+                                        <button type="submit" className="btn pl-3 pr-3 btn-primary" value="REGISTER">등록</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <form className="form-group" onSubmit={(event) => {
+                                event.preventDefault()
+                                var deregistration = this.dereg_req.value
+                                this.deregister(deregistration);
+                            }}>
+                                <label for="address">조회해제 요청</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" className="form-control" placeholder="Corporation Node ID" id="address" ref={(input) => {this.dereg_req = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
+                                    <div class="input-group-append">
+                                        <button type="submit" className="btn pl-3 pr-3 btn-danger" value="DEREGISTER">해제</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                    <form className="form-group" onSubmit={(event) => {
-                        event.preventDefault()
-                        var deregistration = this.dereg_req.value
-                        this.deregister(deregistration);
-                    }}>
-                        <label for="address">조회해제 요청</label>
-                        <div class="input-group mb-3">
-                            <input type="text" className="form-control" placeholder="Corporation Node ID" id="address" ref={(input) => {this.dereg_req = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-                            <div class="input-group-append">
-                                <button type="submit" className="btn pl-3 pr-3 btn-danger" value="DEREGISTER">해제</button>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
                 
                 {/* ---------- */}
@@ -182,19 +192,24 @@ class User extends Component {
                             <p class="lead">LX 주소혁신 프로젝트 아이디어 프론트타입 입니다. 각 사용자 이름은 중복되지 않습니다.</p>
                         </div>
                     </div>
-                    <form className="form-group" onSubmit={(event) => {
-                        event.preventDefault()
-                        var demender = this.demender.value
-                        this.getInfo(demender)
-                    }}>
-                        <label for="corp_id">요청기관 주소</label>
-                        <div class="input-group mb-3">
-                            <input type="text" className="form-control" placeholder="Corporation Node ID" id="corp_id" ref={(input) => {this.demender = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-                            <div class="input-group-append">
-                                <button type="submit" className="btn pl-3 pr-3 btn-primary" value="GETINFO">조회 요청</button>
-                            </div>
+                    <div class="card mb-3">
+                        <div class="card-header">개인 주소정보 조회 요청</div>
+                        <div class="card-body">
+                            <form className="form-group" onSubmit={(event) => {
+                                event.preventDefault()
+                                var demender = this.demender.value
+                                this.getInfo(demender)
+                            }}>
+                                <label for="corp_id">요청기관 주소</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" className="form-control" placeholder="Corporation Node ID" id="corp_id" ref={(input) => {this.demender = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
+                                    <div class="input-group-append">
+                                        <button type="submit" className="btn pl-3 pr-3 btn-primary" value="GETINFO">조회 요청</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
 
                     <div class="card mb-3">
                         <div class="card-header">요청정보 조회</div>
