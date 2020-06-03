@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Tokenizer from '../abis/Tokenizer.json';
-import MessageOwner from '../abis/MessageOwner.json';
+import ServiceHost from '../abis/ServiceHost.json';
+import Client from '../abis/Client.json';
 import Web3 from 'web3';
 //import './App.css';
 
@@ -35,10 +35,10 @@ class User extends Component {
         //Deployed smart contract instance, taken by web3.
         //Color is defined by grabbing abi json file from /src/abis
         const networkId = await web3.eth.net.getId()
-        const networkData = Tokenizer.networks[networkId]
+        const networkData = ServiceHost.networks[networkId]
         //Prevents app to blow up.
         if(networkData) {
-          const abi = Tokenizer.abi
+          const abi = ServiceHost.abi
           const address = networkData.address
           //get contract and save it to the state
           const contract = new web3.eth.Contract(abi, address)
@@ -73,11 +73,11 @@ class User extends Component {
                 name: name,
                 address: address
             })
-            this.state.contract.methods.getOwnerAddress(this.state.name).call({from: this.state.account}).then((res) => {
+            this.state.contract.methods.getClientAddress(this.state.name).call({from: this.state.account}).then((res) => {
                 this.setState({
                     contractId: res
                 })
-                const abi = MessageOwner.abi
+                const abi = Client.abi
                 const client = new web3.eth.Contract(abi, this.state.contractId)
                 this.setState({ mount: client })
                 if(this.state.mount == null) {

@@ -1,5 +1,5 @@
-const tokenizer = artifacts.require('./Tokenizer');
+const serviceHost = artifacts.require('./ServiceHost');
 
 module.exports = ((deployer) => {
-    deployer.deploy(tokenizer);
+    deployer.deploy(serviceHost);
 });
