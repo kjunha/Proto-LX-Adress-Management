@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-contract MessageOwner {
-    string public name;
-    string public residence;
-    address public host;
+contract Client {
+    string name;
+    string residence;
+    address host;
     mapping(address => bool) accessability;
     event UpdateAddress(string residence);
     constructor(string memory _name, string memory _residence) public {
@@ -28,7 +28,7 @@ contract MessageOwner {
         accessability[_corpId] = false;
     }
 
-    function updateAddress(string memory _residence) public {
+    function updateResidence(string memory _residence) public {
         residence = _residence;
     }
 
