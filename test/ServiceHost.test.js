@@ -1,5 +1,6 @@
 const ServiceHost = artifacts.require("./ServiceHost");
 const Client = artifacts.require("./Client");
+const TruffleAssert = require("truffle-assertions")
 require('chai').use(require('chai-as-promised')).should();
 contract("ServiceHost", (accounts) => {
     let contract
@@ -23,9 +24,10 @@ contract("ServiceHost", (accounts) => {
         const residence = "Seoul"
         let client_addr;
         let client;
+        let transaction;
         it('client successfully registered', async () => {
-            await contract.signup(name, residence);
-            client_addr = await contract.getOwnerAddress(name);
+            transaction = await contract.signup(name, residence);
+            client_addr = await contract.getClientAddress(name);
             console.log(`Owner Address: ${client_addr}`);
             assert.notEqual(client_addr, '');
             assert.notEqual(client_addr, 0x0);
@@ -35,6 +37,16 @@ contract("ServiceHost", (accounts) => {
             const {0: reg_name, 1: reg_addr} = await client.getInfo();
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
+        })
+
+        it('[--event] register new client emitted, update address emitted', async () => {
+            TruffleAssert.eventEmitted(transaction, 'RegisterNewClient', (event) => {
+                return event.name == name && event.residence == residence
+            })
+            const innerTx = await TruffleAssert.createTransactionResult(client, transaction.tx)
+            TruffleAssert.eventEmitted(innerTx, 'UpdateResidentialAddress', (event) => {
+                return event.residence == residence
+            })
         })
 
         it('host can access anytime', async() => {
@@ -69,13 +81,22 @@ contract("ServiceHost", (accounts) => {
         const residence = "Seoul 123"
         let client_addr;
         let client;
+        let transaction
         it('client address successfully updated', async () => {
-            await contract.signup(name, residence);
-            client_addr = await contract.getOwnerAddress(name);
+            transaction = await contract.signup(name, residence);
+            client_addr = await contract.getClientAddress(name);
             client = await Client.at(client_addr);
             const {0: reg_name, 1: reg_addr} = await client.getInfo();
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
+        })
+
+        it('[--event] register new client not emitted, update address emitted', async () => {
+            TruffleAssert.eventNotEmitted(transaction, 'RegisterNewClient')
+            const innerTx = await TruffleAssert.createTransactionResult(client, transaction.tx)
+            TruffleAssert.eventEmitted(innerTx, 'UpdateResidentialAddress', (event) => {
+                return event.residence == residence
+            })
         })
     })
 })
