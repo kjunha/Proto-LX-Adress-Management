@@ -1,10 +1,10 @@
-const Tokenizer = artifacts.require("./Tokenizer");
-const MessageOwner = artifacts.require("./MessageOwner");
+const ServiceHost = artifacts.require("./ServiceHost");
+const Client = artifacts.require("./Client");
 require('chai').use(require('chai-as-promised')).should();
-contract("Tokenizer", (accounts) => {
+contract("ServiceHost", (accounts) => {
     let contract
     before(async () => {
-        contract = await Tokenizer.deployed()
+        contract = await ServiceHost.deployed()
     })
 
     describe('deployment', async () => {
@@ -18,62 +18,62 @@ contract("Tokenizer", (accounts) => {
         })
     })
 
-    describe('register an user', async () => {
+    describe('register a client', async () => {
         const name = "user1";
         const residence = "Seoul"
-        let user_addr;
-        let user;
-        it('user successfully registered', async () => {
+        let client_addr;
+        let client;
+        it('client successfully registered', async () => {
             await contract.signup(name, residence);
-            user_addr = await contract.getOwnerAddress(name);
-            console.log(`Owner Address: ${user_addr}`);
-            assert.notEqual(user_addr, '');
-            assert.notEqual(user_addr, 0x0);
-            assert.notEqual(user_addr, undefined);
-            assert.notEqual(user_addr, null);
-            user = await MessageOwner.at(user_addr);
-            const {0: reg_name, 1: reg_addr} = await user.getInfo();
+            client_addr = await contract.getOwnerAddress(name);
+            console.log(`Owner Address: ${client_addr}`);
+            assert.notEqual(client_addr, '');
+            assert.notEqual(client_addr, 0x0);
+            assert.notEqual(client_addr, undefined);
+            assert.notEqual(client_addr, null);
+            client = await Client.at(client_addr);
+            const {0: reg_name, 1: reg_addr} = await client.getInfo();
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
         })
 
         it('host can access anytime', async() => {
-            const {0: reg_name, 1: reg_addr} = await user.getInfo();
+            const {0: reg_name, 1: reg_addr} = await client.getInfo();
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
         })
 
         it('unregistered node cannot access', async() => {
-            const {0: reg_name, 1: reg_addr} = await user.getInfo({from: accounts[1]});
+            const {0: reg_name, 1: reg_addr} = await client.getInfo({from: accounts[1]});
             assert.notEqual(reg_name, name);
             assert.notEqual(reg_addr, residence);
         })
 
         it('registered node can access', async() => {
-            await user.register(accounts[2]);
-            const {0: reg_name, 1: reg_addr} = await user.getInfo({from: accounts[2]});
+            await client.register(accounts[2]);
+            const {0: reg_name, 1: reg_addr} = await client.getInfo({from: accounts[2]});
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
         })
 
         it('deregistered node cannot access', async() => {
-            await user.deregister(accounts[2]);
-            const {0: reg_name, 1: reg_addr} = await user.getInfo({from: accounts[2]});
+            await client.deregister(accounts[2]);
+            const {0: reg_name, 1: reg_addr} = await client.getInfo({from: accounts[2]});
             assert.notEqual(reg_name, name);
             assert.notEqual(reg_addr, residence);
         })
     })
 
-    describe('update user information', async() => {
+    describe('update client information', async() => {
         const name = "user1";
         const residence = "Seoul 123"
-        let user_addr;
-        let user;
-        it('user address successfully updated', async () => {
+        let client_addr;
+        let client;
+        it('client address successfully updated', async () => {
             await contract.signup(name, residence);
-            user_addr = await contract.getOwnerAddress(name);
-            user = await MessageOwner.at(user_addr);
-            const {0: reg_name, 1: reg_addr} = await user.getInfo();
+            client_addr = await contract.getOwnerAddress(name);
+            client = await Client.at(client_addr);
+            const {0: reg_name, 1: reg_addr} = await client.getInfo();
             assert.equal(reg_name, name);
             assert.equal(reg_addr, residence);
         })
