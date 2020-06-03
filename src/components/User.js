@@ -43,7 +43,6 @@ class User extends Component {
           //get contract and save it to the state
           const contract = new web3.eth.Contract(abi, address)
           this.setState({ contract });
-          console.log(contract)
         } else {
           window.alert("smart contract is not deployed on this network")
         }
@@ -51,6 +50,7 @@ class User extends Component {
     }
 
     constructor(props) {
+        console.log(`constructor works`)
         super(props)
         this.state = {
             account: '',
@@ -62,7 +62,9 @@ class User extends Component {
             received: {
                 name: '',
                 address: ''
-            }
+            },
+            historyList: [],
+            histToggle: false
         }
     }
 
@@ -80,11 +82,6 @@ class User extends Component {
                 const abi = Client.abi
                 const client = new web3.eth.Contract(abi, this.state.contractId)
                 this.setState({ mount: client })
-                if(this.state.mount == null) {
-                    console.log("client not mounted!")
-                } else {
-                    console.log(this.state.mount.options.address);
-                }
             })
         })
     }
@@ -120,30 +117,38 @@ class User extends Component {
     }
 
     viewMovingLog = () => {
+        this.setState({historyList: []})
         this.state.mount.getPastEvents('UpdateResidentialAddress',{
             fromBlock: 0,
             toBlock: "latest"
-        }, (err, res) => { res.forEach((record, index) => {
-            console.log(`${index}: ${record.returnValues.residence}`)
+        }, (err, res) => { res.forEach((record, idx) => {
+            this.setState({
+                historyList: [...this.state.historyList, {
+                    index: idx,
+                    residence: record.returnValues.residence,
+                    timestamp: record.returnValues.timestamp
+                }],
+                histToggle: true
+            })
+            })
         })
-    })
-
     }
     
     render() {
+        console.log(`rendered. state: ${this.state.histToggle}`)
         return(
             <div className="master">
                 {/* Client Page */}
-                <div class="px-3 py-3 bg-success">
-                    <div class="jumbotron jumbotron-fluid">
-                        <div class="container">
-                            <h2 class="display-4">사용자 페이지</h2>
-                            <p class="lead">LX 주소혁신 프로젝트 아이디어 프론트타입 입니다. 각 사용자 이름은 중복되지 않습니다.</p>
+                <div className="px-3 py-3 bg-success">
+                    <div className="jumbotron jumbotron-fluid">
+                        <div className="container">
+                            <h2 className="display-4">사용자 페이지</h2>
+                            <p className="lead">LX 주소혁신 프로젝트 아이디어 프론트타입 입니다. 각 사용자 이름은 중복되지 않습니다.</p>
                         </div>
                     </div>
-                    <div class="card mb-3">
-                        <div class="card-header">주소정보 등록</div>
-                        <div class="card-body">
+                    <div className="card mb-3">
+                        <div className="card-header">주소정보 등록</div>
+                        <div className="card-body">
                             <form className="form-group" onSubmit={(event) => {
                                 event.preventDefault()
                                 var name = this.name.value
@@ -158,13 +163,13 @@ class User extends Component {
                             </form>
                         </div>
                     </div>
-                    <div class="card mb-3">
-                        <div class="card-header">등록정보 조회</div>
-                        <div class="card-body">
+                    <div className="card mb-3">
+                        <div className="card-header">등록정보 조회</div>
+                        <div className="card-body">
                             <p>Contract 주소: {this.state.contractId}</p>
                             <p>내 이름: {this.state.name}</p>
                             <p>내 주소: {this.state.address}</p>
-                            <button className="btn btn-block btn-primary" onClick={() => {
+                            <button className="btn btn-block btn-secondary" onClick={() => {
                                 if(this.state.mount != null) {
                                     this.viewMovingLog()
                                 } else {
@@ -173,18 +178,31 @@ class User extends Component {
                             }}>주소변경이력 조회</button>
                         </div>
                     </div>
-                    <div class="card mb-3">
-                        <div class="card-header">조회가능기업 등록 및 해제</div>
-                        <div class="card-body">
+                    {this.state.histToggle ? (
+                        <div className="alert alert-success alert-dismissible fade show" role="alert">
+                            <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={console.log("clicked")}>
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 className="alert-heading">{this.state.name}의 주소변경이력</h4>
+                            <p>순번, 주소, 변경일시 순으로 나열되어 있습니다.(예시) 1. 서울시 종로구 세종대로 (1234567)</p>
+                            <ol>
+                                {this.state.historyList.map((item, index) => { return <li key={index}>{item.residence} ({item.timestamp})</li> })}
+                            </ol>
+                        </div>
+                    ) : null}
+
+                    <div className="card mb-3">
+                        <div className="card-header">조회가능기업 등록 및 해제</div>
+                        <div className="card-body">
                             <form className="form-group" onSubmit={(event) => {
                                 event.preventDefault()
                                 var registration = this.reg_req.value
                                 this.register(registration)
                             }}>
                                 <label for="name">조회승인 요청</label>
-                                <div class="input-group mb-3">
+                                <div className="input-group mb-3">
                                     <input type="text" className="form-control" placeholder="Corporation Node ID" id="name" ref={(input) => {this.reg_req = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-                                    <div class="input-group-append">
+                                    <div className="input-group-append">
                                         <button type="submit" className="btn pl-3 pr-3 btn-primary" value="REGISTER">등록</button>
                                     </div>
                                 </div>
@@ -195,9 +213,9 @@ class User extends Component {
                                 this.deregister(deregistration);
                             }}>
                                 <label for="address">조회해제 요청</label>
-                                <div class="input-group mb-3">
+                                <div className="input-group mb-3">
                                     <input type="text" className="form-control" placeholder="Corporation Node ID" id="address" ref={(input) => {this.dereg_req = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-                                    <div class="input-group-append">
+                                    <div className="input-group-append">
                                         <button type="submit" className="btn pl-3 pr-3 btn-danger" value="DEREGISTER">해제</button>
                                     </div>
                                 </div>
@@ -211,24 +229,24 @@ class User extends Component {
 
                 {/* Corporation Side */}
                 <div className="px-3 py-3  bg-info">
-                    <div class="jumbotron jumbotron-fluid">
-                        <div class="container">
-                            <h2 class="display-4">기업 페이지</h2>
-                            <p class="lead">LX 주소혁신 프로젝트 아이디어 프론트타입 입니다. 각 사용자 이름은 중복되지 않습니다.</p>
+                    <div className="jumbotron jumbotron-fluid">
+                        <div className="container">
+                            <h2 className="display-4">기업 페이지</h2>
+                            <p className="lead">LX 주소혁신 프로젝트 아이디어 프론트타입 입니다. 각 사용자 이름은 중복되지 않습니다.</p>
                         </div>
                     </div>
-                    <div class="card mb-3">
-                        <div class="card-header">개인 주소정보 조회 요청</div>
-                        <div class="card-body">
+                    <div className="card mb-3">
+                        <div className="card-header">개인 주소정보 조회 요청</div>
+                        <div className="card-body">
                             <form className="form-group" onSubmit={(event) => {
                                 event.preventDefault()
                                 var demender = this.demender.value
                                 this.getInfo(demender)
                             }}>
                                 <label for="corp_id">요청기관 주소</label>
-                                <div class="input-group mb-3">
+                                <div className="input-group mb-3">
                                     <input type="text" className="form-control" placeholder="Corporation Node ID" id="corp_id" ref={(input) => {this.demender = input}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-                                    <div class="input-group-append">
+                                    <div className="input-group-append">
                                         <button type="submit" className="btn pl-3 pr-3 btn-primary" value="GETINFO">조회 요청</button>
                                     </div>
                                 </div>
@@ -236,9 +254,9 @@ class User extends Component {
                         </div>
                     </div>
 
-                    <div class="card mb-3">
-                        <div class="card-header">요청정보 조회</div>
-                        <div class="card-body">
+                    <div className="card mb-3">
+                        <div className="card-header">요청정보 조회</div>
+                        <div className="card-body">
                             <p>이름: {this.state.received.name}</p>
                             <p>주소: {this.state.received.address}</p>
                         </div>

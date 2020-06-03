@@ -81,9 +81,10 @@ contract("ServiceHost", (accounts) => {
         const residence = "Seoul 123"
         let client_addr;
         let client;
-        let transaction
+        let serviceHostTx;
+
         it('client address successfully updated', async () => {
-            transaction = await contract.signup(name, residence);
+            serviceHostTx = await contract.signup(name, residence);
             client_addr = await contract.getClientAddress(name);
             client = await Client.at(client_addr);
             const {0: reg_name, 1: reg_addr} = await client.getInfo();
@@ -92,11 +93,17 @@ contract("ServiceHost", (accounts) => {
         })
 
         it('[--event] register new client not emitted, update address emitted', async () => {
-            TruffleAssert.eventNotEmitted(transaction, 'RegisterNewClient')
-            const innerTx = await TruffleAssert.createTransactionResult(client, transaction.tx)
-            TruffleAssert.eventEmitted(innerTx, 'UpdateResidentialAddress', (event) => {
+            TruffleAssert.eventNotEmitted(serviceHostTx, 'RegisterNewClient')
+            const clientTx = await TruffleAssert.createTransactionResult(client, serviceHostTx.tx)
+            TruffleAssert.eventEmitted(clientTx, 'UpdateResidentialAddress', (event) => {
                 return event.residence == residence
             })
+        })
+
+        it('[--event] event only emitted when the address is new', async () => {
+            serviceHostTx = await contract.signup(name, residence);
+            const clientTx = await TruffleAssert.createTransactionResult(client, serviceHostTx.tx)
+            TruffleAssert.eventNotEmitted(clientTx, 'UpdateResidentialAddress')
         })
     })
 })
