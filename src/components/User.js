@@ -111,6 +111,24 @@ class User extends Component {
             })
         })
     }
+
+    viewRegisterationLog = () => {
+        this.state.contract.getPastEvents('RegisterNewClient',{
+            fromBlock: 0,
+            toBlock: "latest"
+        }, (err, res) => { console.log(res.length) })
+    }
+
+    viewMovingLog = () => {
+        this.state.mount.getPastEvents('UpdateResidentialAddress',{
+            fromBlock: 0,
+            toBlock: "latest"
+        }, (err, res) => { res.forEach((record, index) => {
+            console.log(`${index}: ${record.returnValues.residence}`)
+        })
+    })
+
+    }
     
     render() {
         return(
@@ -136,7 +154,7 @@ class User extends Component {
                                 <input type="text" className="form-control mb-3" id="nane" ref={(input) => {this.name = input}}/>
                                 <label for="address">주소</label>
                                 <input type="text" className="form-control mb-3" id="address" ref={(input) => {this.address = input}}/>
-                                <button type="submit" className="btn pl-3 pr-3 btn-primary" value="SIGNUP">등록</button>
+                                <button type="submit" className="btn btn-block btn-primary" value="SIGNUP">등록</button>
                             </form>
                         </div>
                     </div>
@@ -146,6 +164,13 @@ class User extends Component {
                             <p>Contract 주소: {this.state.contractId}</p>
                             <p>내 이름: {this.state.name}</p>
                             <p>내 주소: {this.state.address}</p>
+                            <button className="btn btn-block btn-primary" onClick={() => {
+                                if(this.state.mount != null) {
+                                    this.viewMovingLog()
+                                } else {
+                                    alert(`먼저 사용자 등록을 해 주세요.`)
+                                }
+                            }}>주소변경이력 조회</button>
                         </div>
                     </div>
                     <div class="card mb-3">
